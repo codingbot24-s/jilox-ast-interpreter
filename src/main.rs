@@ -22,7 +22,7 @@ fn run_file (path: String) {
     let f = File::open(path).expect("error opening file");
     let mut buf = Vec::new();
     let mut reader = BufReader::new(f);
-    reader.read_to_end(&mut buf);
+    reader.read_to_end(&mut buf).expect("error reading file");
     println!("running the file");
 
     // run 

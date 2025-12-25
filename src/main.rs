@@ -66,6 +66,51 @@ fn run(source: &[u8]) -> Result<(), JiloxError> {
     Ok(())
 }
 
+enum TokenType {
+    LEFTPAREN,
+    RIGHTPAREN,
+    LEFTBRACE,
+    RIGHTBRACE,
+    COMMA,
+    DOT,
+    MINUS,
+    PLUS,
+    SEMICOLON,
+    SLASH,
+    STAR,
+
+    BANG,
+    BANGEQUAL,
+    EQUAL,
+    EQUALEQUAL,
+    GREATER,
+    GREATEREQUAL,
+    LESS,
+    LESSEQUAL,
+
+    IDENTIFIER,
+    STRING,
+    NUMBER,
+
+    AND,
+    CLASS,
+    ELSE,
+    FALSE,
+    FUN,
+    FOR,
+    IF,
+    NIL,
+    OR,
+    PRINT,
+    RETURN,
+    SUPER,
+    THIS,
+    TRUE,
+    VAR,
+    WHILE,
+
+    EOF,
+}
 
 fn main() {
     let args: Vec<String> = args().collect();
@@ -78,5 +123,3 @@ fn main() {
         run_prompt();
     }
 }
-
-

@@ -1,7 +1,6 @@
+use core::fmt;
 use std::{
-    env::args,
-    fs::File,
-    io::{self, BufReader, Read},
+    env::args, fmt::write, fs::File, io::{self, BufReader, Read}
 };
 
 struct JiloxError {
@@ -111,6 +110,51 @@ enum TokenType {
 
     EOF,
 }
+
+
+
+enum Literal {
+    Number(f64),
+    String(String),
+    Bool(bool),
+    Nil,
+}
+
+struct Token {
+    token_type:TokenType,
+    lexeme: String,
+    literal: Option<Literal>,
+    line:usize
+}
+
+impl Token {
+    pub fn new (ttype: TokenType,lexeme:String,litreal:Option<Literal>,line:usize) -> Token {
+        Token{
+            token_type:ttype,
+            lexeme:lexeme,
+            literal:litreal,
+            line:line,
+
+        }
+    }
+
+}
+
+
+// TODO: (saad) -> else clause not match cant acceess the enum
+
+// impl fmt::Display for Token {
+//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+//         write!(f,"{},{},{}",self.token_type,self.lexeme,
+//             if let Some(literal) = self.literal {
+//                 literal
+//             }else {
+                
+//             }
+//         )
+//     }
+// }
+
 
 fn main() {
     let args: Vec<String> = args().collect();

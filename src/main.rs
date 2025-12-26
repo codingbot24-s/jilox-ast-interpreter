@@ -1,6 +1,9 @@
 use core::fmt;
 use std::{
-    env::args, fmt::write, fs::File, io::{self, BufReader, Read}
+    env::args,
+    fmt::write,
+    fs::File,
+    io::{self, BufReader, Read},
 };
 
 struct JiloxError {
@@ -65,6 +68,7 @@ fn run(source: &[u8]) -> Result<(), JiloxError> {
     Ok(())
 }
 
+#[derive(Debug)]
 enum TokenType {
     LEFTPAREN,
     RIGHTPAREN,
@@ -112,7 +116,7 @@ enum TokenType {
 }
 
 
-
+#[derive(Debug)]
 enum Literal {
     Number(f64),
     String(String),
@@ -121,40 +125,51 @@ enum Literal {
 }
 
 struct Token {
-    token_type:TokenType,
+    token_type: TokenType,
     lexeme: String,
     literal: Option<Literal>,
-    line:usize
+    line: usize,
+}
+impl std::fmt::Display for Token {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?} {} {:?}", self.token_type, self.lexeme, self.literal)
+    }
 }
 
 impl Token {
-    pub fn new (ttype: TokenType,lexeme:String,litreal:Option<Literal>,line:usize) -> Token {
-        Token{
-            token_type:ttype,
-            lexeme:lexeme,
-            literal:litreal,
-            line:line,
-
+    pub fn new(ttype: TokenType, lexeme: String, litreal: Option<Literal>, line: usize) -> Token {
+        Token {
+            token_type: ttype,
+            lexeme: lexeme,
+            literal: litreal,
+            line: line,
         }
     }
-
+    
 }
 
+// TODO: Impl scanner
+struct Scanner {
+    source:String,
+    start:usize,
+    current:usize,
+    line:usize,
+    tokens:Vec<Token>,
+}
 
-// TODO: (saad) -> else clause not match cant acceess the enum
-
-// impl fmt::Display for Token {
-//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-//         write!(f,"{},{},{}",self.token_type,self.lexeme,
-//             if let Some(literal) = self.literal {
-//                 literal
-//             }else {
-                
-//             }
-//         )
-//     }
-// }
-
+impl Scanner {
+    // TODO: error move of tokens
+    fn scan_tokens (&mut self) {
+        while !self.is_at_end() {
+            self.start = self.current;
+            self.scan_tokens();
+        } 
+        self.tokens.push(Token::new(TokenType::EOF, "".to_string(), Some(Literal::Nil), self.line));
+    }
+    fn is_at_end (&self) -> bool {
+        self.current >= self.source.len()    
+    }
+}
 
 fn main() {
     let args: Vec<String> = args().collect();

@@ -158,7 +158,24 @@ struct Scanner {
 }
 
 impl Scanner {
-    // TODO: error move of tokens
+
+
+    pub fn new (source:String) -> Self {
+        Scanner {
+            source,
+            start:0,
+            current:0,
+            line:1,
+            tokens:Vec::new(), 
+        }
+    }
+
+    // TODO: return the tokens
+    /*  
+        scan_token will check if we are at the end of source then it will 
+        push the eof token and fucntion will end else it will recursively call itself
+
+    */
     fn scan_tokens (&mut self) {
         while !self.is_at_end() {
             self.start = self.current;
@@ -166,9 +183,42 @@ impl Scanner {
         } 
         self.tokens.push(Token::new(TokenType::EOF, "".to_string(), Some(Literal::Nil), self.line));
     }
+    // check if we are at the end of source 
     fn is_at_end (&self) -> bool {
         self.current >= self.source.len()    
+    } 
+
+    // will check the token type 
+    fn scan_token (&mut self) {
+        if let Some(c) = self.advance() {
+            match c {
+                ')' => {}
+                '(' => {}
+                '{' => {}
+                '}' => {}
+                ',' => {}
+                '.' => {}
+                '-' => {}
+                '+' => {}
+                ';' => {}
+                '*' => {}
+
+                _ => {}
+            }
+        }
     }
+
+    // advance will advance our cursor to the next char in the source and return the next char else will return None
+    fn advance (&mut self) -> Option<char> {
+        if let Some(c ) = self.source.chars().nth(self.current) {
+            self.current+=1;
+            Some(c)
+            
+        }else {
+            None
+        }
+    }
+    
 }
 
 fn main() {

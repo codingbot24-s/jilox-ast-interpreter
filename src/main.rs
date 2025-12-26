@@ -25,7 +25,7 @@ impl JiloxError {
 }
 
 fn run_prompt() {
-    println!(">");
+    print!(">");
     for line in io::stdin().lines() {
         if let Ok(l) = line {
             if l.is_empty() {
@@ -223,10 +223,9 @@ impl Scanner {
 
 fn main() {
     let args: Vec<String> = args().collect();
-    println!("{}", args.len());
     if args.len() > 2 {
         println!("Usage: jlox [script]");
-    } else if args.len() == 1 {
+    } else if args.len() == 2 {
         run_file(&args[1]).expect("error running file");
     } else {
         run_prompt();

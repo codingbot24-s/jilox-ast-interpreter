@@ -3,7 +3,7 @@ use std::{
     env::args,
     fmt::write,
     fs::File,
-    io::{self, BufReader, Read},
+    io::{self, BufReader, Read, SeekFrom},
 };
 
 struct JiloxError {
@@ -150,7 +150,7 @@ impl Token {
 
 // TODO: Impl scanner
 struct Scanner {
-    source:String,
+    source:Vec<char>,
     start:usize,
     current:usize,
     line:usize,
@@ -162,7 +162,7 @@ impl Scanner {
 
     pub fn new (source:String) -> Self {
         Scanner {
-            source,
+            source:source.chars().collect(),
             start:0,
             current:0,
             line:1,
@@ -188,9 +188,9 @@ impl Scanner {
         self.current >= self.source.len()    
     } 
 
-    // will check the token type 
+    // will check the token type and add the token 
     fn scan_token (&mut self) {
-        if let Some(c) = self.advance() {
+        let c = self.advance(); 
             match c {
                 ')' => {}
                 '(' => {}
@@ -203,25 +203,34 @@ impl Scanner {
                 ';' => {}
                 '*' => {}
 
-                _ => {}
+                _ => {
+                    unreachable!("unknown token");
+                }
             }
-        }
+        
     }
 
     // advance will advance our cursor to the next char in the source and return the next char else will return None
-    fn advance (&mut self) -> Option<char> {
-        if let Some(c ) = self.source.chars().nth(self.current) {
-            self.current+=1;
-            Some(c)
-            
-        }else {
-            None
-        }
+    fn advance (&mut self) -> char {
+        let result = *self.source.get(self.current).unwrap(); 
+        self.current+=1;
+        result
+    }
+    // it will call the token add_token_objects with None 
+    fn add_tokens (&mut self,ttype:TokenType) {
+        self.add_token_objects(ttype,None)
+    }
+    // add the tokens in Vec 
+    fn add_token_objects (&mut self, ttype:TokenType,object:Option<Literal>) {
+        let lexeme = &self.source[self.start .. self.current];
+        let s:String = lexeme.into_iter().collect();
+        self.tokens.push(Token::new(ttype, s, object, self.line));
     }
     
 }
 
 fn main() {
+    
     let args: Vec<String> = args().collect();
     if args.len() > 2 {
         println!("Usage: jlox [script]");

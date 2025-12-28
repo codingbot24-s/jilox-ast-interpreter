@@ -3,7 +3,7 @@ use std::{
     f32::consts::E,
     fs::{self, File},
     io::{self, BufReader, Read, Write, stdout},
-    iter::Scan,
+    iter::Scan, vec,
 };
 
 struct JiloxError {
@@ -254,7 +254,7 @@ impl Scanner {
                 if self.peek_char('/') {
                     // then its is comment we need to move further
                     println!("found comment skipiing");
-                    while self.peak() != '\n' && !self.is_at_end() {
+                    while self.peek() != '\n' && !self.is_at_end() {
                         let _ = self.advance()?;
                     }
                 } else {
@@ -271,6 +271,9 @@ impl Scanner {
             }
             '"' => {
                 self.string()?;
+            }
+            '0'..'9' => {
+                self.number();
             }
             _ => {
                 return Err(JiloxError::error(
@@ -316,7 +319,7 @@ impl Scanner {
     }
 
     // peak will return the char
-    fn peak(&self) -> char {
+    fn peek(&self) -> char {
         if self.is_at_end() {
             '\0'
         } else {
@@ -325,8 +328,8 @@ impl Scanner {
     }
 
     fn string(&mut self) -> Result<(), JiloxError> {
-        while self.peak() != '"' && !self.is_at_end() {
-            if self.peak() == '\n' {
+        while self.peek() != '"' && !self.is_at_end() {
+            if self.peek() == '\n' {
                 self.line+=1;
             }
             self.advance()?;
@@ -341,6 +344,39 @@ impl Scanner {
         self.add_token_objects(TokenType::STRING, Some(Literal::String(value)));
         Ok(())
     }
+
+    fn is_digit (&self ,c:char) -> bool {
+        return c >= '0' && c <= '9'
+    }
+
+    fn number (&mut self) {
+        // 11 it can be pass with this but this will stop at . because its not digit
+        while self.is_digit(self.peek()) {
+            let _ = self.advance();
+        }
+        // but for 11.111 we need to consume that . also
+        if self.peek() == '.' && self.is_digit(self.peek_next()) {
+            let _ = self.advance();
+
+
+            while self.is_digit(self.peek()) {
+                let _ = self.advance();
+            }
+        }
+
+        let value:String = self.source[self.start .. self.current].iter().collect();
+        let num:f64 = value.parse().unwrap();
+        self.add_token_objects(TokenType::NUMBER, Some(Literal::Number(num)));
+    }
+
+    fn peek_next (&self) -> char {
+        if self.current + 1 > self.source.len() {
+            return '\0' 
+        }else {
+            return self.source[self.current + 1];
+        }
+    }
+
 }
 
 fn main() {
@@ -352,4 +388,5 @@ fn main() {
     } else {
         run_prompt();
     }
+   
 }

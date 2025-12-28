@@ -61,8 +61,8 @@ fn run(source: String) -> Result<(), JiloxError> {
     // run the source code
     // we can use match and remove unsafe
     let mut sc = Scanner::new(source);
-    let token = sc.scan_tokens()?;
-    for t in token {
+    let tokens = sc.scan_tokens()?;
+    for t in tokens {
         println!("{}", t);
     }
     Ok(())
@@ -208,7 +208,7 @@ impl Scanner {
 
     // will check the token type and add the token
     fn scan_token(&mut self) -> Result<(), JiloxError> {
-        let c = self.advance();
+        let c = self.advance()?;
         match c {
             '(' => self.add_tokens(TokenType::LEFTPAREN),
             ')' => self.add_tokens(TokenType::RIGHTPAREN),
@@ -254,8 +254,8 @@ impl Scanner {
                 if self.peek_char('/') {
                     // then its is comment we need to move further
                     println!("found comment skipiing");
-                    while self.skip_comment() != '\n' && !self.is_at_end() {
-                        let _ = self.advance();
+                    while self.peak() != '\n' && !self.is_at_end() {
+                        let _ = self.advance()?;
                     }
                 } else {
                     self.add_tokens(TokenType::SLASH);
@@ -269,6 +269,9 @@ impl Scanner {
                 self.line+=1;
                 println!("line is {} ",self.line);
             }
+            '"' => {
+                self.string()?;
+            }
             _ => {
                 return Err(JiloxError::error(
                     self.line,
@@ -279,12 +282,11 @@ impl Scanner {
         Ok(())
     }
 
-    // advance will advance to the next char in the source and return the next char else will return None
-    fn advance(&mut self) -> char {
-        // TODO: remove unwrap it will panic
-        let result = *self.source.get(self.current).expect("errorr getting next char");
-        self.current+=1;
-        result
+    // advance will advance to the next char in the source and return the next char
+    fn advance(&mut self) -> Result<char, JiloxError> {
+        let result = self.source.get(self.current).copied().ok_or_else(|| JiloxError::error(self.line, "Unexpected end of source".to_string()))?;
+        self.current += 1;
+        Ok(result)
     }
     // it will call the token add_token_objects with None
     fn add_tokens(&mut self, ttype: TokenType) {
@@ -313,12 +315,31 @@ impl Scanner {
         return true;
     }
 
-    fn skip_comment(&self) -> char {
+    // peak will return the char
+    fn peak(&self) -> char {
         if self.is_at_end() {
             '\0'
         } else {
             self.source[self.current]
         }
+    }
+
+    fn string(&mut self) -> Result<(), JiloxError> {
+        while self.peak() != '"' && !self.is_at_end() {
+            if self.peak() == '\n' {
+                self.line+=1;
+            }
+            self.advance()?;
+        }
+        if self.is_at_end() {
+            return Err(JiloxError::error(self.line, "unterminated string".to_string()));
+        }
+        // capture the last "
+        self.advance()?;
+
+        let value:String = self.source[self.start + 1 .. self.current - 1].iter().collect();
+        self.add_token_objects(TokenType::STRING, Some(Literal::String(value)));
+        Ok(())
     }
 }
 

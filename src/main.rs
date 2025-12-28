@@ -261,6 +261,14 @@ impl Scanner {
                     self.add_tokens(TokenType::SLASH);
                 }
             }
+            ' ' => {println!("Space skiping")} 
+            '\r' => {println!("\r skiping")}
+            '\t' => {println!("\t skiping")} 
+            '\n' => {
+                println!("line was {} ",self.line);
+                self.line+=1;
+                println!("line is {} ",self.line);
+            }
             _ => {
                 return Err(JiloxError::error(
                     self.line,

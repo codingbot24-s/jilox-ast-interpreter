@@ -276,6 +276,12 @@ impl Scanner {
                 self.number();
             }
             _ => {
+                // if char is alphabatic call identifier
+                if c.is_alphabetic() {
+                    self.identifier();
+
+                    return Ok(());
+                }    
                 return Err(JiloxError::error(
                     self.line,
                     "unexpected character".to_string(),
@@ -377,6 +383,17 @@ impl Scanner {
         }
     }
 
+    fn identifier (&self) {
+        /* 
+            1. peek till alpha numeric and alpha numeric will 
+            check if it is alphabetic or is_digit 
+
+            2.  define hashmap with keywords and check for that text in 
+                map if found call addtoken with that type  
+            3. else call it with identifier
+        */  
+        println!("identifier called")
+    }
 }
 
 fn main() {

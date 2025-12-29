@@ -151,7 +151,6 @@ impl Token {
     }
 }
 
-// TODO: Impl scanner
 struct Scanner {
     source: Vec<char>,
     start: usize,
@@ -162,7 +161,7 @@ struct Scanner {
 
 impl Scanner {
     pub fn new(source: String) -> Self {
-        Scanner {
+         Scanner {
             source: source.chars().collect(),
             start: 0,
             current: 0,
@@ -170,6 +169,7 @@ impl Scanner {
             tokens: Vec::new(),
         }
     }
+
 
     // TODO: return the tokens
     /*
@@ -399,8 +399,13 @@ impl Scanner {
         } 
 
         let s:String = self.source[self.start .. self.current].iter().collect();
-        
-        println!("the string in identifier is {}", s);
+        // TODO: where to define the map and how to get the correct type
+        if let Some (tt) = Scanner::keyword_check(s.as_str()) {
+            self.add_tokens(tt);
+        }else {
+            self.add_tokens(TokenType::IDENTIFIER);
+        }
+                 
     }
 
     fn c_a_an(&self,c:char) -> bool {
@@ -410,6 +415,40 @@ impl Scanner {
             return false;
         }  
     } 
+
+    pub fn keyword_check (word:&str) -> Option<TokenType> {
+        match word {
+            "and" => Some(TokenType::AND),
+            "class" => Some(TokenType::CLASS),
+            "if" => Some(TokenType::IF),
+            "else" => Some(TokenType::ELSE),
+            "true" => Some(TokenType::TRUE),
+            "false" => Some(TokenType::FALSE),
+            "for" => Some(TokenType::CLASS),
+            "fun" => Some(TokenType::FUN),
+
+            "nil"=> Some(TokenType::NIL),
+
+            "or"=> Some(TokenType::OR),
+
+            "print" => Some(TokenType::PRINT),
+
+            "return" => Some(TokenType::RETURN),
+
+            "super" => Some(TokenType::SUPER),
+
+            "this" => Some(TokenType::THIS),
+
+            "var" => Some(TokenType::VAR),
+
+            "while" => Some(TokenType::WHILE),
+
+            _ => {
+                None
+            }
+        }
+
+    }
 }
 
 fn main() {

@@ -4,6 +4,7 @@ use std::{
     fs::{self, File},
     io::{self, BufReader, Read, Write, stdout},
     iter::Scan, vec,
+    collections::HashMap,
 };
 
 struct JiloxError {
@@ -383,7 +384,7 @@ impl Scanner {
         }
     }
 
-    fn identifier (&self) {
+    fn identifier (&mut self) {
         /* 
             1. peek till alpha numeric and alpha numeric will 
             check if it is alphabetic or is_digit 
@@ -391,9 +392,24 @@ impl Scanner {
             2.  define hashmap with keywords and check for that text in 
                 map if found call addtoken with that type  
             3. else call it with identifier
-        */  
-        println!("identifier called")
+        */
+
+        while self.c_a_an(self.peek()) {
+            let _ = self.advance();
+        } 
+
+        let s:String = self.source[self.start .. self.current].iter().collect();
+        
+        println!("the string in identifier is {}", s);
     }
+
+    fn c_a_an(&self,c:char) -> bool {
+       if c.is_alphabetic() || self.is_digit(c) {
+            return true;
+       }else {
+            return false;
+        }  
+    } 
 }
 
 fn main() {
